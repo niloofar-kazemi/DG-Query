@@ -4,8 +4,8 @@ float left = 0;
 float scale = 1;
 
 void setup() {
-  // size(1440 , 900);
-  fullScreen();
+  size(1440 , 900);
+  // fullScreen();
   frameRate(60);
   collections = new ArrayList<Collection>();
   // in Action file
@@ -13,7 +13,7 @@ void setup() {
 }
 
 void draw() { 
-	background(200);
+	background(64);
 	scale(scale);
 	translate(left , top);
 	if(collections != null){
@@ -62,3 +62,29 @@ void mouseDragged() {
 		left += mouseX - pmouseX;		
 	}
 }
+
+void mousePressed() {
+	if(collections != null){
+		for (int i = 0; i < collections.size(); ++i) {
+			Collection col = collections.get(i);
+			col.pressed();
+		}
+	}
+}
+
+void mouseReleased() {
+	if(collections != null){
+		for (int i = 0; i < collections.size(); ++i) {
+			Collection col = collections.get(i);
+			col.released();
+		}
+	}
+}
+
+
+
+
+
+
+
+

@@ -18,6 +18,7 @@ public static class Network{
 	}
 
 	public void sendRequest(String url , final NetworkCallback callback){
+		println("url: "+url);
 		Request request = new Request.Builder()
         .url(url)
         .build();

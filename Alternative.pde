@@ -41,6 +41,6 @@ public static class Alternative{
 	}
 
 	public String getImageURL(){
-		return "http://sr-02645.iat.sfu.ca:5050/" + imageURL;
+		return "http://127.0.0.1:5050/" + imageURL;
 	}
 }

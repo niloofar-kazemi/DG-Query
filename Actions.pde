@@ -10,7 +10,7 @@ void fetchCollections(){
 	  		fetchAlternatives(); // fetching alternatives after collections
 	  	}
 	};
-	Network.getInstance().sendRequest("http://sr-02645.iat.sfu.ca:5050/collections", callback);
+	Network.getInstance().sendRequest("http://127.0.0.1:5050/collections", callback);
 }
 
 /* gets all the alternatives after getting collections */
@@ -23,7 +23,7 @@ void fetchAlternatives(){
 			fetchLayouts();
 	  	}
 	};
-	Network.getInstance().sendRequest("http://sr-02645.iat.sfu.ca:5050/alternatives", callback);
+	Network.getInstance().sendRequest("http://127.0.0.1:5050/alternatives", callback);
 }
 
 /* gets all the layouts for collections after getting alternatives */
@@ -32,7 +32,6 @@ void fetchLayouts(){
 	  	@Override
 	  	public void onResult(String layoutResponse){
 	  		/*  Parsing all the data into collections and alternative instances*/
-
 	  		JSONArray colData = parseJSONArray(fetchedCollections);
 
 			JSONObject altResponse = parseJSONObject(fetchedAlternatives);
@@ -52,5 +51,5 @@ void fetchLayouts(){
 			
 	  	}
 	};
-	Network.getInstance().sendRequest("http://sr-02645.iat.sfu.ca:5050/layout", callback);
+	Network.getInstance().sendRequest("http://127.0.0.1:5050/layout", callback);
 }

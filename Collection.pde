@@ -27,6 +27,7 @@ public class Collection{
 		
 		findAlternativesWithAltId(alternativesData , newCollection.getJSONArray("altsid"));
 		findLayoutWithCollectionId(layoutData , viewId);
+
 		parallelView = new ParallelCordinate(this , keySets , valueBands);
 		thumbNailView = new Thumbnail(this);
 		collectionView = parallelView;
@@ -81,7 +82,7 @@ public class Collection{
 
 	public void draw(){
 		// draw the collection background
-		fill(255);
+		fill(225);
 		rect(x, y, colWidth, colHeight, 7);
 
 		// draw the collection name
@@ -96,20 +97,6 @@ public class Collection{
 		// draw a switch for toggling between PC view and Thumb view 
 		drawSwitch();
 
-	}
-
-	public void clicked(){		
-		checkForSwitch();
-	}
-
-	public boolean dragged(){
-		if (mouseX > scale*(this.getX()+left) && mouseY > scale*(this.getY()+top) && mouseX < scale*(this.getX()+this.getWidth()+left) && mouseY < scale*(this.getY()+top+this.getHeight())) {
-			this.setX(this.getX() - pmouseX + mouseX);
-			this.setY(this.getY() - pmouseY + mouseY);
-			return true; 
-		}
-
-		return false;
 	}
 
 	public void drawSwitch() {
@@ -150,32 +137,56 @@ public class Collection{
 			collectionView = parallelView;
 		}
 	}
+	/* interactions */
+	public void clicked(){		
+		checkForSwitch();
+	}
 
+	public boolean dragged(){
+		if (collectionView.dragged()) {
+			return true;
+		}
+		else if (mouseX > scale*(this.getX()+left) && mouseY > scale*(this.getY()+top) && mouseX < scale*(this.getX()+this.getWidth()+left) && mouseY < scale*(this.getY()+top+this.getHeight())) {
+			this.setX(this.getX() - pmouseX + mouseX);
+			this.setY(this.getY() - pmouseY + mouseY);
+			return true; 
+		}
+
+		return false;
+	}
+
+	public void pressed(){	
+		 collectionView.pressed();
+	}
+
+	public void released(){	
+		 collectionView.released();
+	}
 	/* get and sets */
 	public void setX(float newX) {
 		x = newX;
 
 		parallelView.setX(newX);
-		parallelView.update(this);
+		parallelView.update();
 
 		thumbNailView.setX(newX);
-		thumbNailView.update(this);
+		thumbNailView.update();
 
 		collectionView.setX(newX);
-		collectionView.update(this);		
+		collectionView.update();		
 	}
 
 	public void setY(float newY) {
 		y = newY;
 
 		parallelView.setY(newY);
-		parallelView.update(this);
+		parallelView.update();
 
 		thumbNailView.setY(newY);
-		thumbNailView.update(this);
+		thumbNailView.update();
 
 		collectionView.setY(newY);
-		collectionView.update(this);
+		collectionView.update();
 
 	}
 

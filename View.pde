@@ -20,8 +20,20 @@ public class View{
 
 	}
 
-	public void update(Collection collection) {
+	public void update() {
 		
+	}
+
+	/* interaction */
+
+	public void pressed(){	
+	}
+
+	public void released(){	
+	}
+
+	public boolean dragged(){
+		return false;
 	}
 
 	/* get and sets */
