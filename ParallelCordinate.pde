@@ -1,10 +1,14 @@
 public class ParallelCordinate extends View{
 	private Collection collection;
+
 	private ArrayList<Dimension> dimensions;
 	private ArrayList<ArrayList<JSONObject>> paths; 	
 	private JSONArray keySets;
 	private JSONObject valueBands;
 	private ArrayList<Integer> selectedAlternatives;
+	private ArrayList<Link> links;
+	private Link currentLink ;
+	private boolean isLinking= false;
 
 	public ParallelCordinate(Collection collection ,JSONArray keySets ,JSONObject valueBands) {
 		super(collection,"PC");
@@ -12,6 +16,8 @@ public class ParallelCordinate extends View{
 		dimensions = new ArrayList<Dimension>();
 		paths = new ArrayList<ArrayList<JSONObject>>();
 		selectedAlternatives = new ArrayList<Integer>();
+		links = new ArrayList<Link>();
+		currentLink = null;
 
 		this.keySets = keySets;
 		this.valueBands = valueBands;
@@ -34,24 +40,33 @@ public class ParallelCordinate extends View{
 		}
 	}
 
-	public void createPaths(ArrayList<Alternative> alternaives ){
+	/* creates a new path for each alternative and checks all the brushes to see if the new path is in the brushe range */
+	public void createPaths(ArrayList<Alternative> alternaives){
+		ArrayList<String> selectedRefIds = new ArrayList<String>();
+
+		//creating the path for each alternative
 		for (int j = 0; j < alternaives.size(); ++j) {
+			Alternative currentAlt = alternaives.get(j);
+
 			ArrayList<JSONObject> path = new ArrayList<JSONObject>();
 			boolean isAltSelected = true;
 			int brushesCount = 0;
+
+			// create a node for each dimention
 			for (int i = 0; i < dimensions.size(); ++i) {
-				Alternative currentAlt = alternaives.get(j);
 				Dimension currentDim = dimensions.get(i);
 
 				JSONObject newNode = new JSONObject();
 				float valueLength = abs(currentDim.getMax() - currentDim.getMin());
 
+				// find the position of the node on the dimesntion based on the alternative value for that dimenstion
 				float yPosition = 70 + this.getY() + this.getHeight()*(abs(currentAlt.getValueForParam(currentDim.getName())-currentDim.getMax())/valueLength);				
 
 				newNode.setFloat("x" , currentDim.getX());
 				newNode.setFloat("y" , yPosition);				
 
 
+				// check if the node is in the range of the brushes that were create till now
 				boolean isNodeSelected = false;
 				ArrayList<Brush> brushes = currentDim.getBrushes();
 				for (int m = 0; m < brushes.size(); ++m) {
@@ -62,32 +77,84 @@ public class ParallelCordinate extends View{
 					}
 				}
 
+				// check if the node is in the range of the current brush that is being created 
 				Brush currentBrush = currentDim.getCurrentBrush();
 				if (currentBrush != null) {
 					if ((newNode.getFloat("y") >= currentBrush.getStart() && newNode.getFloat("y") <= currentBrush.getEnd()) || (newNode.getFloat("y") <= currentBrush.getStart() && newNode.getFloat("y") >= currentBrush.getEnd())) {
 						isNodeSelected = true;
 					}
 					brushesCount ++;
-				}
+				}				
 
+				// if there's no brush we assume that the node is in the range 
 				if (brushes.size() == 0 && currentBrush == null) {
 					isNodeSelected = true;
 				}
+
+				// checks if there's a brush on the dimention and the node is in the range
 				if(!isNodeSelected){
 					isAltSelected = false;
 				}
+
+				//counting all the brushes to see if there's any brush on the pc or not
 				brushesCount += brushes.size();
 
 				path.add(newNode);
 			}
 
+			//check if the alternative is in the links ranges
+			for (int m = 0; m < links.size(); ++m) {
+				ArrayList<Brush> linkBrushes = links.get(m).getBrushes();
+				int isInLink = 0;
+				for (int n = 0; n < linkBrushes.size(); ++n) {
+					Brush currBrush = linkBrushes.get(n);
+					for (int i = 0; i < path.size(); ++i) {
+						Dimension currentDim = dimensions.get(i);
+						JSONObject newNode = path.get(i);
+						if (currentDim.getName() == currBrush.getDimName()) {
+							if ((newNode.getFloat("y") >= currBrush.getStart() && newNode.getFloat("y") <= currBrush.getEnd()) || (newNode.getFloat("y") <= currBrush.getStart() && newNode.getFloat("y") >= currBrush.getEnd())) {
+								isInLink ++;
+							}
+						}
+					}
+				}				
+				if (isInLink > 0 && isInLink < linkBrushes.size()) {
+					isAltSelected = false;
+					break;
+				}
+			}
+
+			//check if the alternative is in the current link ranges
+			if (currentLink != null) {				
+				ArrayList<Brush> linkBrushes = currentLink.getBrushes();
+				int isInLink = 0;
+				for (int n = 0; n < linkBrushes.size(); ++n) {
+					Brush currBrush = linkBrushes.get(n);
+					for (int i = 0; i < path.size(); ++i) {
+						Dimension currentDim = dimensions.get(i);
+						JSONObject newNode = path.get(i);
+						if (currentDim.getName() == currBrush.getDimName()) {
+							if ((newNode.getFloat("y") >= currBrush.getStart() && newNode.getFloat("y") <= currBrush.getEnd()) || (newNode.getFloat("y") <= currBrush.getStart() && newNode.getFloat("y") >= currBrush.getEnd())) {
+								isInLink ++;
+							}
+						}
+					}
+				}				
+				if (isInLink > 0 && isInLink < linkBrushes.size()) {
+					isAltSelected = false;					
+				}
+			}
+
 			if (brushesCount==0) {
 				isAltSelected = false;
 			}
-			if (isAltSelected) {
-				selectedAlternatives.add(j);
+			if (isAltSelected) {				
+				selectedRefIds.add(currentAlt.getRefId());
 			}
 			paths.add(path);
+		}
+		if (selectedRefIds.size()>0) {
+			brushListener.onChange(selectedRefIds);
 		}
 	}
 
@@ -96,6 +163,9 @@ public class ParallelCordinate extends View{
 		dimensions = new ArrayList<Dimension>();
 		paths = new ArrayList<ArrayList<JSONObject>>();
 		selectedAlternatives = new ArrayList<Integer>();
+		links = new ArrayList<Link>();
+		currentLink = null;
+		isLinking = true;
 
 		createDimensions();
 		createPaths(collection.getAlternatives());
@@ -131,13 +201,18 @@ public class ParallelCordinate extends View{
 			stroke(64);
 			// noStroke();
 		}
+
+		for (int i = 0; i < links.size(); ++i) {
+			links.get(i).draw();
+		}
+		if (currentLink != null) {
+			currentLink.draw();
+		}
 	}
 
 	/* interactions */
 	@Override
-	public void pressed(){
-
-	}
+	public void pressed(){}
 
 	@Override
 	public void released(){	
@@ -152,7 +227,7 @@ public class ParallelCordinate extends View{
 		for (int i = 0; i < dimensions.size(); ++i) {
 			if(dimensions.get(i).dragged()){
 				result = true;
-				// update();
+				
 				paths = new ArrayList<ArrayList<JSONObject>>();
 				selectedAlternatives = new ArrayList<Integer>();
 				createPaths(collection.getAlternatives());
@@ -161,6 +236,57 @@ public class ParallelCordinate extends View{
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public void clicked() {
+		for (int i = 0; i < dimensions.size(); ++i) {
+			Brush br = dimensions.get(i).clicked();
+			if (br != null) {
+				// if we are in linking mode
+				if (isLinking) {
+					//if there's already a current linking in process keep adding to that otherwise create a new Link
+					if (currentLink != null) {
+						currentLink.add(br);
+					}else{						
+						currentLink = new Link(br);
+					}
+
+					paths = new ArrayList<ArrayList<JSONObject>>();
+					selectedAlternatives = new ArrayList<Integer>();
+					createPaths(collection.getAlternatives());
+
+				}
+			}
+		}
+	}
+
+	@Override
+	public void keyPressed() {
+		if (key == 'l') {			
+			if (isLinking == true) {
+				isLinking = false;
+				if (currentLink != null) {
+					links.add(currentLink);
+					currentLink = null;					
+				}
+			}else{
+				isLinking = true;
+			}
+		}
+	}
+
+	@Override
+	public void brushChange(ArrayList<String> newRefIds) {
+		selectedAlternatives = new ArrayList<Integer>();
+		for (int i = 0; i < collection.getAlternatives().size(); ++i) {
+			Alternative tmpAlt = collection.getAlternatives().get(i);
+			for (int j = 0; j < newRefIds.size(); ++j) {
+				if(tmpAlt.getRefId().equals(newRefIds.get(j))){
+					selectedAlternatives.add(i);
+				}				
+			}
+		}
 	}
 
 }

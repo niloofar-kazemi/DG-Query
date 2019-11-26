@@ -3,12 +3,13 @@ public class Brush{
 	private float start;
 	private float end;
 	private float posX;
+	private String dimName;
 
-
-	public Brush(float posX, float start) {
+	public Brush(float posX, float start, String dimName) {
 		this.posX = posX;
 		this.start = start;
 		this.end = start;
+		this.dimName = dimName;
 	}
 
 	public void draw(){
@@ -25,6 +26,24 @@ public class Brush{
 
 	/* interactions */
 	public boolean dragged(){
+		if(abs(mouseX - scale*(posX+left)) < 5 && ( 
+			(mouseY > scale*(top+start) && mouseY < scale*(end+top)) || 
+			(mouseY > scale*(top+end) && mouseY < scale*(start+top)) 
+		)){
+			start += mouseY - pmouseY;
+			end += mouseY - pmouseY;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean clicked() {
+		if(abs(mouseX - scale*(posX+left)) < 5 && ( 
+			(mouseY > scale*(top+start) && mouseY < scale*(end+top)) || 
+			(mouseY > scale*(top+end) && mouseY < scale*(start+top)) 
+		)){			
+			return true;
+		}
 		return false;
 	}
 
@@ -47,6 +66,10 @@ public class Brush{
 
 	public float getX(){
 		return posX;
+	}
+
+	public String getDimName(){
+		return dimName;
 	}
 
 }

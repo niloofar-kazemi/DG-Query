@@ -3,7 +3,7 @@ public static class Alternative{
 	private String refId;
 	private JSONObject params;
 	private JSONObject outputs;
-	private String imageURL;
+	private String imageURL;	
 
 	//view properies
 	private float x;
@@ -29,6 +29,23 @@ public static class Alternative{
 
 	}
 
+	public float getDistance(Alternative alt){	
+		float powerSum = 0;	
+		Iterator keys = outputs.keys().iterator();
+		while(keys.hasNext()) {
+		    String key = (String)keys.next();
+		    if (outputs.hasKey(key)) {
+		    	powerSum += pow(outputs.getFloat(key) - alt.getValueForParam(key),2);		    	
+		    }
+		}
+		return sqrt(powerSum);
+	}
+
+	/*get and sets*/
+	public String getRefId(){
+		return refId;
+	}
+
 	public float getValueForParam(String dimName) {
 		float result = 0;
 		if (params.hasKey(dimName)) {
@@ -41,6 +58,6 @@ public static class Alternative{
 	}
 
 	public String getImageURL(){
-		return "http://127.0.0.1:5050/" + imageURL;
+		return "http://sr-02645.iat.sfu.ca:5050/" + imageURL;
 	}
 }

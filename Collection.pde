@@ -33,6 +33,22 @@ public class Collection{
 		collectionView = parallelView;
 	}
 
+	// creates a new collection from scratch
+	public Collection(String id, ArrayList<Alternative> alternatives, String name,  float x, float y, float colWidth, float colHeight, JSONArray keySets, JSONObject valueBands){
+		this.alternatives = alternatives;
+		this.name = name;
+		this.viewId = id;
+		this.refId = id;
+		this.x = x;
+		this.y = y;
+		this.colWidth = colWidth;
+		this.colHeight = colHeight;
+
+		parallelView = new ParallelCordinate(this , keySets , valueBands);
+		thumbNailView = new Thumbnail(this);
+		collectionView = parallelView;
+	}
+
 	/* gets ids of the alternatives in the collection and finds them in JSONArray of all the alternatives*/
 	public void findAlternativesWithAltId(JSONArray alternativesData , JSONArray altsId){
 
@@ -138,8 +154,9 @@ public class Collection{
 		}
 	}
 	/* interactions */
-	public void clicked(){		
+	public void clicked(){
 		checkForSwitch();
+		collectionView.clicked();
 	}
 
 	public boolean dragged(){
@@ -147,8 +164,8 @@ public class Collection{
 			return true;
 		}
 		else if (mouseX > scale*(this.getX()+left) && mouseY > scale*(this.getY()+top) && mouseX < scale*(this.getX()+this.getWidth()+left) && mouseY < scale*(this.getY()+top+this.getHeight())) {
-			this.setX(this.getX() - pmouseX + mouseX);
-			this.setY(this.getY() - pmouseY + mouseY);
+			this.setX(this.getX() + ((mouseX - pmouseX)/scale));
+			this.setY(this.getY() + ((mouseY - pmouseY)/scale));
 			return true; 
 		}
 
@@ -161,6 +178,24 @@ public class Collection{
 
 	public void released(){	
 		 collectionView.released();
+	}
+
+	public void wheel(){
+		collectionView.wheel();
+	}
+
+	public void brushChange(ArrayList<String> newRefIds){
+		parallelView.brushChange(newRefIds);
+		thumbNailView.brushChange(newRefIds);
+		if (collectionView != null) {
+			collectionView.brushChange(newRefIds);
+		}
+	}
+
+	public void keyPressed() {
+		if (collectionView != null) {
+			collectionView.keyPressed();
+		}
 	}
 	/* get and sets */
 	public void setX(float newX) {

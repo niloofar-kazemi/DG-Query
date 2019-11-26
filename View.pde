@@ -32,8 +32,20 @@ public class View{
 	public void released(){	
 	}
 
+	public void clicked(){
+	}
+
+	public void keyPressed() {
+	}
+
 	public boolean dragged(){
 		return false;
+	}
+
+	public void wheel() {
+	}
+
+	public void brushChange(ArrayList<String> newRefIds) {
 	}
 
 	/* get and sets */
@@ -64,6 +76,5 @@ public class View{
 	public String getType(){
 		return type;
 	}
-
 
 }

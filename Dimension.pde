@@ -62,7 +62,7 @@ public class Dimension{
 			return true;
 		}
 		else{
-			if(abs(mouseX - posX) < 5 && mouseY > posY && mouseY < posY + dimHeight){
+			if(abs(mouseX - scale*(posX+left)) < 5 && mouseY > scale*(top+posY) && mouseY < scale*(posY + dimHeight+top)){
 				boolean result=false;
 				for (int i = 0; i < brushes.size(); ++i) {
 					if(brushes.get(i).dragged()){
@@ -71,7 +71,7 @@ public class Dimension{
 					}
 				}	
 				if(!result){
-					currentBrush = new Brush(posX, mouseY);
+					currentBrush = new Brush(posX, (mouseY/scale)-top, name);
 				}
 				return true;
 			}		
@@ -86,6 +86,16 @@ public class Dimension{
 		}
 	}
 
+	public Brush clicked() {
+		for (int i = 0; i < brushes.size(); ++i) {
+			Brush br = brushes.get(i);
+			if (br.clicked()) {
+				return br;
+			}
+		}
+
+		return null;
+	}
 	/* set and gets */
 	public float getX(){
 		return posX;

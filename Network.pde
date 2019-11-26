@@ -17,8 +17,7 @@ public static class Network{
 		client = new OkHttpClient();
 	}
 
-	public void sendRequest(String url , final NetworkCallback callback){
-		println("url: "+url);
+	public void sendRequest(String url , final NetworkCallback callback){		
 		Request request = new Request.Builder()
         .url(url)
         .build();
