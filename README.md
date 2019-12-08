@@ -1,6 +1,6 @@
 # DG-Query
 # Manuscript 
-NOTE : you need internet connection to get the data from the Design Gallery server 
+<strong>NOTE</strong> : you need internet connection to get the data from the Design Gallery server 
 
 1 - press + ('shift' + '=') to zoom in </br>
 2 - press - to zoom out </br>
