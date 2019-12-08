@@ -29,9 +29,9 @@ void draw() {
 }
 
 void keyPressed(){
-	if (key == '+') {
+	if (key == '+') {// press + to zoom in
 		scale += 0.2;
-	}else if (key == '-'){
+	}else if (key == '-'){// press - to zoom out
 		scale -= 0.2;
 	}
 
